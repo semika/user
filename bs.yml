@@ -1,0 +1,64 @@
+version: 0.2
+
+phases:
+
+  install:
+    commands:
+      - echo Initializing docker deamon...
+      - nohup /usr/local/bin/dockerd --host=unix:///var/run/docker.sock --host=tcp://0.0.0.0:2375 --storage-driver=overlay&
+      - timeout 15 sh -c "until docker info; do echo .; sleep 1; done"
+
+      # Installing KubeCtl command line
+      - echo Installing Kubectl command line
+      - curl -o kubectl https://amazon-eks.s3.us-west-2.amazonaws.com/1.18.9/2020-11-02/bin/linux/amd64/kubectl
+      - chmod +x ./kubectl
+      - mkdir -p $HOME/bin && cp ./kubectl $HOME/bin/kubectl && export PATH=$PATH:$HOME/bin
+      - kubectl version --short --client
+      # Install Iam Authenticator
+      - curl -o aws-iam-authenticator https://amazon-eks.s3-us-west-2.amazonaws.com/1.13.7/2019-06-11/bin/linux/amd64/aws-iam-authenticator
+      - chmod +x ./aws-iam-authenticator
+      - mkdir -p $HOME/bin && cp ./aws-iam-authenticator $HOME/bin/aws-iam-authenticator && export PATH=$HOME/bin:$PATH
+      - aws-iam-authenticator help
+      # Configure kubectl
+      #- aws eks --region $AWS_DEFAULT_REGION update-kubeconfig --name IIT-ASE-EKS-Cluster
+      #- aws eks --region $AWS_DEFAULT_REGION update-kubeconfig --name IIT-ASE-EKS-Cluster  --role-arn arn:aws:iam::762002331286:role/service-role/codebuild-ase-cw-service-role
+
+  pre_build:
+    commands:
+      - echo Logging in to Amazon ECR...
+      - $(aws ecr get-login --region $AWS_DEFAULT_REGION --no-include-email)
+  build:
+    commands:
+      - echo Bulding User Module.....
+      - mvn clean install
+      - echo Build started on `date`
+      - echo Building the Docker image...          
+      - docker build -t $IMAGE_REPO_NAME:$IMAGE_TAG .
+      - docker tag $IMAGE_REPO_NAME:$IMAGE_TAG $AWS_ACCOUNT_ID.dkr.ecr.$AWS_DEFAULT_REGION.amazonaws.com/$IMAGE_REPO_NAME:$IMAGE_TAG      
+  post_build:
+    commands:
+      - echo Build completed on `date`
+      - echo Pushing the Docker image...
+      - docker push $AWS_ACCOUNT_ID.dkr.ecr.$AWS_DEFAULT_REGION.amazonaws.com/$IMAGE_REPO_NAME:$IMAGE_TAG
+      # Extracting AWS Credential Information using STS Assume Role for kubectl
+      - echo "Setting Environment Variables related to AWS CLI for Kube Config Setup"          
+      - CREDENTIALS=$(aws sts assume-role --role-arn arn:aws:iam::762002331286:role/service-role/codebuild-ase-cw-service-role --role-session-name codebuild-kubectl --duration-seconds 900)
+      - export AWS_ACCESS_KEY_ID="$(echo ${CREDENTIALS} | jq -r '.Credentials.AccessKeyId')"
+      - export AWS_SECRET_ACCESS_KEY="$(echo ${CREDENTIALS} | jq -r '.Credentials.SecretAccessKey')"
+      - export AWS_SESSION_TOKEN="$(echo ${CREDENTIALS} | jq -r '.Credentials.SessionToken')"
+      - export AWS_EXPIRATION=$(echo ${CREDENTIALS} | jq -r '.Credentials.Expiration')
+      # Setup kubectl with our EKS Cluster              
+      - echo "Update Kube Config"      
+      - aws eks --region $AWS_DEFAULT_REGION update-kubeconfig --name IIT-ASE-EKS-Cluster
+      # Apply changes to our Application using kubectl
+      #- echo "Apply changes to kube manifests"            
+      #- kubectl apply -f kube-manifests/
+      - aws --version
+      #- kubectl apply -f aws-auth.yml
+      - kubectl get pods
+      - kubectl version --short --client
+      - kubectl apply -f user.yml
+
+cache:
+  paths:
+    - '/root/.m2/**/*'

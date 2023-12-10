@@ -1,0 +1,54 @@
+version: 0.2
+
+phases:
+
+  install:
+    commands:
+      - echo AWS CLI version
+      - aws --version
+      - echo AWS Caller Indentity
+      - aws sts get-caller-identity
+      - echo Initializing docker deamon...
+      - nohup /usr/local/bin/dockerd --host=unix:///var/run/docker.sock --host=tcp://0.0.0.0:2375 --storage-driver=overlay&
+      - timeout 15 sh -c "until docker info; do echo .; sleep 1; done"
+
+      # Installing KubeCtl command line
+      - echo Installing Kubectl command line
+      - curl -o kubectl https://amazon-eks.s3.us-west-2.amazonaws.com/1.18.9/2020-11-02/bin/linux/amd64/kubectl
+      - chmod +x ./kubectl
+      - mkdir -p $HOME/bin && cp ./kubectl $HOME/bin/kubectl && export PATH=$PATH:$HOME/bin
+      - kubectl version --short --client
+      - aws eks update-kubeconfig --name IIT-ASE-EKS-Cluster --region ap-southeast-1 --role-arn arn:aws:iam::762002331286:role/IIT-ASE-CW-EKSAccessToCodeBuildRole
+      - kubectl get nodes
+
+  pre_build:
+    commands:
+      - echo Logging in to Amazon ECR...
+      - $(aws ecr get-login --region $AWS_DEFAULT_REGION --no-include-email)
+  build:
+    commands:
+      - echo Bulding User Module.....
+      - mvn clean install
+      - echo Building the Docker image...          
+      - docker build -t $IMAGE_REPO_NAME:$IMAGE_TAG .
+      - docker tag $IMAGE_REPO_NAME:$IMAGE_TAG $AWS_ACCOUNT_ID.dkr.ecr.$AWS_DEFAULT_REGION.amazonaws.com/$IMAGE_REPO_NAME:$IMAGE_TAG      
+  post_build:
+    commands:
+      - echo Pushing the Docker image...
+      - docker push $AWS_ACCOUNT_ID.dkr.ecr.$AWS_DEFAULT_REGION.amazonaws.com/$IMAGE_REPO_NAME:$IMAGE_TAG
+      - kubectl get nodes
+      - kubectl apply -f user-deployment.yml
+
+cache:
+  paths:
+    - '/root/.m2/**/*'
+
+
+
+
+
+#TRUST="{ \"Version\": \"2012-10-17\", \"Statement\": [ { \"Effect\": \"Allow\", \"Principal\": { \"AWS\": \"arn:aws:iam::762002331286:role/IIT-ASE-CW-CodeBuildServiceRole\" }, \"Action\": \"sts:AssumeRole\" } ] }"
+#aws iam create-role --role-name EksCodeBuildKubectlRole --assume-role-policy-document "$TRUST" --output text --query 'Role.Arn' 
+#ROLE="    - rolearn: arn:aws:iam::762002331286:role/EksCodeBuildKubectlRole\n      username: build\n      groups:\n        - system:masters"
+#kubectl get -n kube-system configmap/aws-auth -o yaml | awk "/mapRoles: \|/{print;print \"$ROLE\";next}1" > /tmp/aws-auth-patch.yml
+#kubectl patch configmap/aws-auth -n kube-system --patch "$(cat /tmp/aws-auth-patch.yml)"

@@ -1,0 +1,25 @@
+spring:
+   application:
+      name: user
+   datasource:
+      url: jdbc:mysql://localhost:3306/learn
+      username: root
+      password: sawen#101
+      driverClassName: com.mysql.cj.jdbc.Driver
+   jpa:
+      show-sql: true
+      database-platform: org.hibernate.dialect.MySQL8Dialect
+      hibernate:
+         ddl-auto: update
+      mapping-resources: name-query/orm.xml
+   h2:
+      console:
+         enabled: true
+         path: /h2-console
+server:
+      port: 9005
+security:
+   server:
+      enable: true
+   client:
+      enable: false

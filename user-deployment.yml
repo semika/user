@@ -1,0 +1,84 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: user-deployment   # The name of the deployment
+  namespace: dev
+  labels:
+    app: user
+spec:
+  replicas: 2    # creates 3 replicated Pods
+  selector:      # defines how the Deployment finds which Pods to manage. This should match with 'template.app' value.
+    matchLabels:
+      app: user  # This lable is used to identify the Pods for the replica set.
+
+  # bellow is the Pod template
+  template:
+    metadata:
+      labels:
+        app: user       # All Pods are labled with 'user'
+    spec:               # Pod tamplate specification, says that, the Pod will run a single container.
+      containers:       # Pod tamplate specification is an array of containers. - Indicates array. Here one container is declared.
+      - name: user      #.spec.template.spec.containers[0].name = user
+        image: user:1.0
+        ports:
+        - containerPort: 9005
+          protocol: TCP
+          name : user-dep-port   # This can be reffered by services via 'targetPort' attribute. 
+      imagePullSecrets:
+      - name: ap-southeast-1-ecr-registry
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: user-service
+  namespace: dev
+spec:
+  #type : ClusterIP  # This is the default service type. The service is only reachable within the cluster. Can not be accessed from out side the cluster.
+  type: NodePort # Expose the service to the outside of the cluster via a 'NodePort'. 'ClusterIP' service is created internally and NodePort routes the requets to that.
+  selector:
+    app: user # This should exactly match with the corresponding deployement lable. spec.template.metadata.labels.app 
+  ports:
+  - port: 9005
+    protocol: TCP
+    targetPort: 9005
+    # Optional field
+    # By default and for convenience, the Kubernetes control plane will allocate a port from a range (default: 30000-32767)
+    nodePort: 30005
+
+#--- 
+#apiVersion: v1
+#kind: Service
+#metadata:
+#  name: user-service
+#  namespace: default
+#spec:
+#  type: LoadBalancer
+#  selector:
+#    app: user
+#  ports:
+#    - protocol: TCP
+#      port: 9005
+#      targetPort: 9005
+
+############### K8s Command ##############
+# Reffer the 'Deployment' section on K8s documentation for details explanation.
+# https://kubernetes.io/docs/concepts/workloads/controllers/deployment/
+
+# (1) Create deployment
+# > kubectl apply user.yml
+
+
+
+# (2) To get deployment rollout status. When we have large number of Pods are starting, with this command, can know the status.
+# > kubectl rollout status
+
+
+# (3) To see the lables created for each Pod
+# > kubectl get pods --show-labels
+
+# (4) To see ingress details
+# > kubectl get ingress/iitcw 
+
+# (5) To see load balanceer logs
+# kubectl logs -n kube-system   deployment.apps/aws-load-balancer-controller
+
