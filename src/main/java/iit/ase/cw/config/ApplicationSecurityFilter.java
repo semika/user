@@ -25,11 +25,11 @@ import org.springframework.web.filter.GenericFilterBean;
 
 import java.io.IOException;
 
-public class ThaproSecurityFilter extends GenericFilterBean {
+public class ApplicationSecurityFilter extends GenericFilterBean {
 
     private ThaproJwtTokenHandler jwtTokenHandler;
 
-    public ThaproSecurityFilter(ThaproJwtTokenHandler jwtTokenHandler) {
+    public ApplicationSecurityFilter(ThaproJwtTokenHandler jwtTokenHandler) {
         this.jwtTokenHandler = jwtTokenHandler;
     }
 

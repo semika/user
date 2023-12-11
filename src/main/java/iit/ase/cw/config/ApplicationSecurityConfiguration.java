@@ -12,12 +12,12 @@ import org.springframework.security.web.authentication.UsernamePasswordAuthentic
 @Configuration
 @EnableWebSecurity
 @ConditionalOnProperty(value = ThaproSecurityConstant.Security.SECURITY_SERVER_ENABLED, havingValue = "true")
-public class ServerSecurityConfiguration {
+public class ApplicationSecurityConfiguration {
 
     @Bean
     public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
 
-        ThaproSecurityFilter filter = new ThaproSecurityFilter(new ThaproJwtTokenHandler());
+        ApplicationSecurityFilter filter = new ApplicationSecurityFilter(new ThaproJwtTokenHandler());
         http
                 .authorizeHttpRequests((authz) -> authz
                         .anyRequest().authenticated()
