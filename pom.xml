@@ -56,6 +56,14 @@
 			<version>0.0.1-SNAPSHOT</version>
 		</dependency>
 
+		<!-- Security implementation for downstream services and also this contains
+		some common set of classes which can be shared across -->
+		<dependency>
+			<groupId>iit.ase.cw</groupId>
+			<artifactId>platform-sercurity-common</artifactId>
+			<version>0.0.1-SNAPSHOT</version>
+		</dependency>
+
 		<dependency>
 			<groupId>org.springframework.boot</groupId>
 			<artifactId>spring-boot-starter-security</artifactId>
@@ -66,13 +74,6 @@
 			<artifactId>jaxb-api</artifactId>
 			<version>2.3.0</version>
 		</dependency>
-
-
-		<!--		<dependency>-->
-<!--			<groupId>iit.ase.cw</groupId>-->
-<!--			<artifactId>platform-security-client</artifactId>-->
-<!--			<version>0.0.1-SNAPSHOT</version>-->
-<!--		</dependency>-->
 
 	</dependencies>
 
