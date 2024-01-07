@@ -6,12 +6,21 @@ spring:
       username: root
       password: sawen#101
       driverClassName: com.mysql.cj.jdbc.Driver
+      hikari:
+         connection-timeout: 30000
+         minimum-idle: 2
+         idle-timeout: 2000
    jpa:
       show-sql: true
       database-platform: org.hibernate.dialect.MySQL8Dialect
       hibernate:
          ddl-auto: update
+         hibernate:
+            connection:
+               provider-disables-autocommit: true
+
       mapping-resources: name-query/orm.xml
+      open-in-view: true
    h2:
       console:
          enabled: true
@@ -23,3 +32,8 @@ security:
       enable: true
    client:
       enable: false
+logging:
+   level:
+    com:
+     zaxxer:
+      hikari: TRACE

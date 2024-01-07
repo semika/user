@@ -2,17 +2,11 @@ package iit.ase.cw.model.entity;
 
 import iit.ase.cw.platform.jpa.entity.BaseThaproOrganizationTenantEntity;
 
-import jakarta.persistence.Column;
-import jakarta.persistence.Entity;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
-import jakarta.persistence.Id;
-import jakarta.persistence.Table;
+import jakarta.persistence.*;
 
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Data;
-import lombok.NoArgsConstructor;
+import lombok.*;
+
+import java.util.List;
 
 @Entity
 @Table(name="user")
@@ -20,7 +14,8 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
-public class UserEntity extends BaseThaproOrganizationTenantEntity<Long> {
+@ToString
+public class User extends BaseThaproOrganizationTenantEntity<Long> {
 
 	@Id
 	@GeneratedValue(strategy = GenerationType.AUTO)
@@ -34,6 +29,9 @@ public class UserEntity extends BaseThaproOrganizationTenantEntity<Long> {
 	
 	@Column(name = "PASSWORD")
 	private String password;
+
+	@OneToMany(mappedBy = "userEntity", cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.LAZY)
+	private List<UserAddress> addressEntityList;
 
 	@Override
 	public String defaultSortField() {

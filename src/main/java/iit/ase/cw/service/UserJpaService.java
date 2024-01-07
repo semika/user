@@ -1,7 +1,7 @@
 package iit.ase.cw.service;
 
-import iit.ase.cw.model.entity.UserEntity;
-import iit.ase.cw.model.model.UserResource;
+import iit.ase.cw.model.entity.User;
+import iit.ase.cw.model.model.UserDto;
 import iit.ase.cw.platform.common.context.model.ThaproSearchFilter;
 import iit.ase.cw.platform.jpa.service.BaseThaproJpaService;
 import iit.ase.cw.repository.UserRepository;
@@ -18,13 +18,13 @@ import lombok.extern.slf4j.Slf4j;
 
 @Service
 @Slf4j
-public class UserJpaService extends BaseThaproJpaService<UserEntity, Long> {
+public class UserJpaService extends BaseThaproJpaService<User, Long> {
 
     @Autowired
     private UserRepository userRepository;
 
     public UserJpaService() throws InstantiationException, IllegalAccessException {
-        super(UserEntity.class);
+        super(User.class);
     }
 
     @Override
@@ -32,27 +32,27 @@ public class UserJpaService extends BaseThaproJpaService<UserEntity, Long> {
         return userRepository;
     }
 
-    public UserEntity findUserByFirstName(String firstName) {
+    public User findUserByFirstName(String firstName) {
         return userRepository.findUserEntityByFirstName(firstName);
     }
 
-    public UserEntity findUserByLastName(String lastName) {
+    public User findUserByLastName(String lastName) {
         return userRepository.findByLastName(lastName);
     }
 
-    public UserEntity findByCriteria(UserResource userResource, ThaproSearchFilter searchFilter) {
-        UserEntity userEntity = userRepository.findByFirstNameAndLastName(userResource.getFirstName(),
+    public User findByCriteria(UserDto userResource, ThaproSearchFilter searchFilter) {
+        User userEntity = userRepository.findByFirstNameAndLastName(userResource.getFirstName(),
             userResource.getLastName());
         return userEntity;
     }
 
-    public Page<UserEntity> findByCriteriaSpecification(UserResource userResource, ThaproSearchFilter searchFilter) {
+    public Page<User> findByCriteriaSpecification(UserDto userResource, ThaproSearchFilter searchFilter) {
 
-        Specification<UserEntity> firstNameSpecification =
+        Specification<User> firstNameSpecification =
             (root, criteriaQuery, criteriaBuilder) -> criteriaBuilder
                 .equal(root.get("firstName"), userResource.getFirstName());
 
-        Specification<UserEntity> lastNameSpecification =
+        Specification<User> lastNameSpecification =
             (root, criteriaQuery, criteriaBuilder) -> criteriaBuilder
                 .equal(root.get("lastName"), userResource.getLastName());
 
@@ -61,15 +61,15 @@ public class UserJpaService extends BaseThaproJpaService<UserEntity, Long> {
         return userRepository.findAll(firstNameSpecification.and(lastNameSpecification), pageRequest);
     }
 
-    public List<UserEntity> findAllRowEntitiesBySpecification(UserResource userResource, ThaproSearchFilter searchFilter) {
+    public List<User> findAllRowEntitiesBySpecification(UserDto userResource, ThaproSearchFilter searchFilter) {
 
-        Specification<UserEntity> firstNameSpecification = ((root, criteriaQuery, criteriaBuilder)
+        Specification<User> firstNameSpecification = ((root, criteriaQuery, criteriaBuilder)
             -> criteriaBuilder.equal(root.get("firstName"), userResource.getFirstName()));
 
-        Specification<UserEntity> lastNameSpecification = ((root, criteriaQuery, criteriaBuilder)
+        Specification<User> lastNameSpecification = ((root, criteriaQuery, criteriaBuilder)
             -> criteriaBuilder.equal(root.get("lastName"), userResource.getLastName()));
 
-        Specification<UserEntity> filterSpecification = firstNameSpecification.and(lastNameSpecification);
+        Specification<User> filterSpecification = firstNameSpecification.and(lastNameSpecification);
         return findAll(filterSpecification);
     }
 }

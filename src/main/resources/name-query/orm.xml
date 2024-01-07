@@ -9,7 +9,7 @@
     
     <named-query name="UserEntity.findByLastName">
         <query>
-            SELECT user FROM UserEntity user WHERE user.lastName = ?1
+            SELECT user FROM User user WHERE user.lastName = ?1
         </query>
     </named-query>
 

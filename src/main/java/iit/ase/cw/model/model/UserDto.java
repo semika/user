@@ -1,6 +1,6 @@
 package iit.ase.cw.model.model;
 
-import iit.ase.cw.platform.common.type.BaseThaproResource;
+import iit.ase.cw.platform.common.type.BaseThaproDto;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -11,7 +11,7 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
-public class UserResource extends BaseThaproResource<Long> {
+public class UserDto extends BaseThaproDto<Long> {
 
     private Long id;
 
