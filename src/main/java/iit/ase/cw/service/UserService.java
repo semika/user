@@ -12,12 +12,12 @@ import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
-import iit.ase.cw.platform.jpa.service.BaseThaproDtoService;
+import iit.ase.cw.platform.jpa.service.BaseThaproService;
 import org.springframework.data.domain.Page;
 import org.springframework.stereotype.Service;
 
 @Service
-public class UserService extends BaseThaproDtoService<UserDto, User, Long> {
+public class UserService extends BaseThaproService<UserDto, User, Long> {
 
 	private UserJpaService jpaService;
 	private UserConverter converter;

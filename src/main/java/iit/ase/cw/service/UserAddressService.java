@@ -7,13 +7,13 @@ import iit.ase.cw.platform.common.context.model.ThaproSearchFilter;
 import iit.ase.cw.platform.common.converter.ToCollectionConverter;
 import iit.ase.cw.platform.common.service.ThaproResponseHelper;
 import iit.ase.cw.platform.common.type.ThaproResponse;
-import iit.ase.cw.platform.jpa.service.BaseThaproDtoService;
+import iit.ase.cw.platform.jpa.service.BaseThaproService;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
 
 @Service
-public class UserAddressService extends BaseThaproDtoService<UserAddressDto, UserAddress, Long> {
+public class UserAddressService extends BaseThaproService<UserAddressDto, UserAddress, Long> {
 
 	private UserAddressJpaService userAddressJpaService;
 	private UserAddressConverter userAddressConverter;

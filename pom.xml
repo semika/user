@@ -57,7 +57,8 @@
 		</dependency>
 
 		<!-- Security implementation for downstream services and also this contains
-		some common set of classes which can be shared across -->
+		some common set of classes which can be shared across. These common functionalities
+		 will be applicable only for down stream services -->
 		<dependency>
 			<groupId>iit.ase.cw</groupId>
 			<artifactId>platform-sercurity-common</artifactId>

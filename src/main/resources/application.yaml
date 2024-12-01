@@ -17,10 +17,10 @@ spring:
          ddl-auto: update
          hibernate:
             connection:
-               provider-disables-autocommit: true
+               provider-disables-autocommit: false
 
       mapping-resources: name-query/orm.xml
-      open-in-view: true
+      open-in-view: false
    h2:
       console:
          enabled: true
