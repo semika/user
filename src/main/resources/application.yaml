@@ -4,7 +4,7 @@ spring:
    datasource:
       url: jdbc:mysql://localhost:3306/learn
       username: root
-      password: sawen#101
+      password: ${MYSQL_DB_ROOT_PASSWORD}
       driverClassName: com.mysql.cj.jdbc.Driver
       hikari:
          connection-timeout: 30000
